@@ -8,6 +8,115 @@
 
 ---
 
+## 🚀 How to Run (5 minutes, no API keys needed)
+
+The app includes a **Demo Mode** — you can see the full UI, walk through every step,
+and watch the animated video-generation pipeline **without any API keys**.
+
+### Step 1 — Prerequisites
+
+Make sure you have **Node.js 18+** installed:
+
+```bash
+node --version   # should print v18.x or higher
+```
+
+Don't have Node.js? Download it from **https://nodejs.org** (choose the LTS version).
+
+### Step 2 — Clone & install
+
+```bash
+git clone https://github.com/dugududu/AIVideogenerator.git
+cd AIVideogenerator
+npm install
+```
+
+### Step 3 — Run
+
+```bash
+npm run dev
+```
+
+Open **http://localhost:3000** in your browser. That's it! 🎉
+
+> Demo Mode is **on by default** — no `.env.local` file needed to explore the UI.
+
+---
+
+### What you'll see
+
+**Landing page** (`/`) — feature overview, how-it-works, transparent API stack:
+
+![Landing page](public/screenshots/01-landing.png)
+
+**Step 1 — Write your script** (`/generate`):
+
+![Script editor](public/screenshots/03-generate-step1-script-filled.png)
+
+**Step 2 — Choose an AI avatar** (colorful placeholder avatars in demo mode;
+real D-ID / HeyGen photos when API keys are added):
+
+![Avatar picker](public/screenshots/04-generate-step2-avatar.png)
+
+**Step 3 — Video settings** (aspect ratio, resolution, auto-captions):
+
+![Settings panel](public/screenshots/05-generate-step3-settings.png)
+
+**Step 4 — Live pipeline animation** (shows each API call as it runs):
+
+![Generating](public/screenshots/06-generate-step4-animating.png)
+
+**Step 4 — Video complete!**
+
+![Complete](public/screenshots/07-generate-step4-complete.png)
+
+**Pricing page** (`/pricing`):
+
+![Pricing](public/screenshots/08-pricing.png)
+
+---
+
+### Switching from Demo → Real video generation
+
+Once you have API keys, create a `.env.local` file:
+
+```bash
+cp .env.example .env.local
+```
+
+Then edit `.env.local` and add your keys:
+
+```bash
+NEXT_PUBLIC_DEMO_MODE=false          # ← turn off demo mode
+
+ELEVENLABS_API_KEY=your_key_here     # Free: 10k chars/mo — https://elevenlabs.io
+DID_API_KEY=your_key_here            # Free: 5 videos/mo  — https://studio.d-id.com
+```
+
+Restart the dev server (`npm run dev`) and click "Generate Video" — it will call the real APIs.
+
+**Getting free API keys:**
+- **ElevenLabs** (voice): https://elevenlabs.io → Sign up → Profile → API Key
+- **D-ID** (avatar): https://studio.d-id.com → Account → API
+- **HeyGen** (avatar, optional): https://app.heygen.com/settings → API tab
+- **Akool** (face-swap, optional): https://akool.com → Developer → Credentials
+
+---
+
+### Available pages & routes
+
+| URL | What it does |
+|-----|-------------|
+| `http://localhost:3000` | Landing page |
+| `http://localhost:3000/generate` | 4-step video creation wizard |
+| `http://localhost:3000/pricing` | Pricing tiers + API cost breakdown |
+| `http://localhost:3000/api/avatars` | GET — avatar catalogue (JSON) |
+| `http://localhost:3000/api/voice-synthesis` | GET voices / POST generate audio |
+| `http://localhost:3000/api/face-swap` | POST create / GET poll status |
+| `http://localhost:3000/api/generate-video` | POST — full pipeline job |
+
+---
+
 ## Table of Contents
 
 1. [What are AI UGC Video Tools?](#1-what-are-ai-ugc-video-tools)

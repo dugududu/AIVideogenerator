@@ -1,6 +1,8 @@
 // GET /api/avatars
 // Return the catalogue of available AI avatars.
 // In production this would come from a DB; here we return sample data.
+// thumbnailUrl values are inline SVG data-URIs so they render without any network requests.
+// Replace with real D-ID / HeyGen CDN URLs once you have API keys.
 import { NextResponse } from "next/server";
 import type { Avatar } from "@/types";
 

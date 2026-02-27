@@ -2,13 +2,22 @@ import Link from "next/link";
 import { VideoGenerator } from "@/components/video/VideoGenerator";
 import type { Avatar } from "@/types";
 
-// In production this would be fetched from the DB / API.
+// Inline SVG data-URI avatars — always render without any network requests.
+// In production, replace thumbnailUrl with real D-ID / HeyGen avatar image URLs.
+const AVATAR_SVGS = {
+  anna:  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTYwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM3YzNhZWQiIHN0b3Atb3BhY2l0eT0iMC45Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzdjM2FlZCIgc3RvcC1vcGFjaXR5PSIwLjUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTYwIiBmaWxsPSJ1cmwoI2JnKSIgcng9IjAiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI0NCIgcng9IjI4IiByeT0iMjQiIGZpbGw9IiM0YzFkOTUiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI1NSIgcng9IjIyIiByeT0iMjYiIGZpbGw9IiNmYmJmMjQiLz4KICA8cGF0aCBkPSJNMTUgMTYwIFEzMCAxMDAgNjAgOTggUTkwIDEwMCAxMDUgMTYwIFoiIGZpbGw9IiM0YzFkOTUiIG9wYWNpdHk9IjAuOCIvPgogIDxyZWN0IHg9IjUyIiB5PSI3OCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSIjZmJiZjI0IiByeD0iMyIvPgo8L3N2Zz4=",
+  james: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTYwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxZDRlZDgiIHN0b3Atb3BhY2l0eT0iMC45Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFkNGVkOCIgc3RvcC1vcGFjaXR5PSIwLjUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTYwIiBmaWxsPSJ1cmwoI2JnKSIgcng9IjAiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI0NCIgcng9IjI4IiByeT0iMjQiIGZpbGw9IiMxZTNhOGEiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI1NSIgcng9IjIyIiByeT0iMjYiIGZpbGw9IiNjMjg1NWEiLz4KICA8cGF0aCBkPSJNMTUgMTYwIFEzMCAxMDAgNjAgOTggUTkwIDEwMCAxMDUgMTYwIFoiIGZpbGw9IiMxZTNhOGEiIG9wYWNpdHk9IjAuOCIvPgogIDxyZWN0IHg9IjUyIiB5PSI3OCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSIjYzI4NTVhIiByeD0iMyIvPgo8L3N2Zz4=",
+  sofia: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTYwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNiZTE4NWQiIHN0b3Atb3BhY2l0eT0iMC45Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2JlMTg1ZCIgc3RvcC1vcGFjaXR5PSIwLjUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTYwIiBmaWxsPSJ1cmwoI2JnKSIgcng9IjAiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI0NCIgcng9IjI4IiByeT0iMjQiIGZpbGw9IiM4MzE4NDMiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI1NSIgcng9IjIyIiByeT0iMjYiIGZpbGw9IiNmNGEyNjEiLz4KICA8cGF0aCBkPSJNMTUgMTYwIFEzMCAxMDAgNjAgOTggUTkwIDEwMCAxMDUgMTYwIFoiIGZpbGw9IiM4MzE4NDMiIG9wYWNpdHk9IjAuOCIvPgogIDxyZWN0IHg9IjUyIiB5PSI3OCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSIjZjRhMjYxIiByeD0iMyIvPgo8L3N2Zz4=",
+  ryan:  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTYwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwNjVmNDYiIHN0b3Atb3BhY2l0eT0iMC45Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzA2NWY0NiIgc3RvcC1vcGFjaXR5PSIwLjUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTYwIiBmaWxsPSJ1cmwoI2JnKSIgcng9IjAiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI0NCIgcng9IjI4IiByeT0iMjQiIGZpbGw9IiMwNjRlM2IiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI1NSIgcng9IjIyIiByeT0iMjYiIGZpbGw9IiNhMTYyMDciLz4KICA8cGF0aCBkPSJNMTUgMTYwIFEzMCAxMDAgNjAgOTggUTkwIDEwMCAxMDUgMTYwIFoiIGZpbGw9IiMwNjRlM2IiIG9wYWNpdHk9IjAuOCIvPgogIDxyZWN0IHg9IjUyIiB5PSI3OCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSIjYTE2MjA3IiByeD0iMyIvPgo8L3N2Zz4=",
+  mia:   "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTYwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM2ZDI4ZDkiIHN0b3Atb3BhY2l0eT0iMC45Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzZkMjhkOSIgc3RvcC1vcGFjaXR5PSIwLjUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTYwIiBmaWxsPSJ1cmwoI2JnKSIgcng9IjAiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI0NCIgcng9IjI4IiByeT0iMjQiIGZpbGw9IiM0YzFkOTUiLz4KICA8ZWxsaXBzZSBjeD0iNjAiIGN5PSI1NSIgcng9IjIyIiByeT0iMjYiIGZpbGw9IiNmYjkyM2MiLz4KICA8cGF0aCBkPSJNMTUgMTYwIFEzMCAxMDAgNjAgOTggUTkwIDEwMCAxMDUgMTYwIFoiIGZpbGw9IiM0YzFkOTUiIG9wYWNpdHk9IjAuOCIvPgogIDxyZWN0IHg9IjUyIiB5PSI3OCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSIjZmI5MjNjIiByeD0iMyIvPgo8L3N2Zz4=",
+};
+
+// In production, replace thumbnailUrl with real D-ID / HeyGen avatar image URLs.
 const SAMPLE_AVATARS: Avatar[] = [
   {
     id: "did-avatar-anna",
     name: "Anna",
-    thumbnailUrl:
-      "https://create-images-results.d-id.com/DefaultPresenters/Noelle_f/thumbnail.jpeg",
+    thumbnailUrl: AVATAR_SVGS.anna,
     gender: "female",
     style: "realistic",
     provider: "did",
@@ -16,8 +25,7 @@ const SAMPLE_AVATARS: Avatar[] = [
   {
     id: "did-avatar-james",
     name: "James",
-    thumbnailUrl:
-      "https://create-images-results.d-id.com/DefaultPresenters/Ethan_m/thumbnail.jpeg",
+    thumbnailUrl: AVATAR_SVGS.james,
     gender: "male",
     style: "realistic",
     provider: "did",
@@ -25,7 +33,7 @@ const SAMPLE_AVATARS: Avatar[] = [
   {
     id: "heygen-avatar-sofia",
     name: "Sofia",
-    thumbnailUrl: "https://resource.heygen.com/avatar/Sofia.jpg",
+    thumbnailUrl: AVATAR_SVGS.sofia,
     gender: "female",
     style: "realistic",
     provider: "heygen",
@@ -33,7 +41,7 @@ const SAMPLE_AVATARS: Avatar[] = [
   {
     id: "heygen-avatar-ryan",
     name: "Ryan",
-    thumbnailUrl: "https://resource.heygen.com/avatar/Ryan.jpg",
+    thumbnailUrl: AVATAR_SVGS.ryan,
     gender: "male",
     style: "realistic",
     provider: "heygen",
@@ -41,12 +49,13 @@ const SAMPLE_AVATARS: Avatar[] = [
   {
     id: "heygen-avatar-mia",
     name: "Mia",
-    thumbnailUrl: "https://resource.heygen.com/avatar/Mia_animated.jpg",
+    thumbnailUrl: AVATAR_SVGS.mia,
     gender: "female",
     style: "animated",
     provider: "heygen",
   },
 ];
+
 
 export default function GeneratePage() {
   return (
